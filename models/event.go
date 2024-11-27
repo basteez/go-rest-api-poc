@@ -4,9 +4,20 @@ import "time"
 
 type Event struct {
 	ID          int
-	Name        string
-	Description string
-	Location    string
-	DateTime    time.Time
+	Name        string    `binding:"required"`
+	Description string    `binding:"required"`
+	Location    string    `binding:"required"`
+	DateTime    time.Time `binding:"required"`
 	UserID      int
+}
+
+var events []Event = []Event{}
+
+func (event *Event) Save() {
+	// TODO save it to database
+	events = append(events, *event)
+}
+
+func GetAllEvents() []Event {
+	return events
 }

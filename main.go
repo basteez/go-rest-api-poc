@@ -3,11 +3,17 @@ package main
 import (
 	"net/http"
 
+	"bstz.it/rest-api/configuration"
+	"bstz.it/rest-api/db"
 	"bstz.it/rest-api/models"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	configuration.LoadConfig()
+
+	db.InitDB()
+
 	server := gin.Default()
 
 	server.GET("/events", getEvents)

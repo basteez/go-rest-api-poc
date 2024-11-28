@@ -4,7 +4,7 @@ import "log"
 
 func LogOnError(err error, message string) {
 	if err != nil {
-		log.Fatal(message, err)
+		log.Println("[ERROR] ", message, ": ", err)
 	}
 }
 

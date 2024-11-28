@@ -6,6 +6,7 @@ import (
 	"bstz.it/rest-api/configuration"
 	"bstz.it/rest-api/db"
 	"bstz.it/rest-api/models"
+	"bstz.it/rest-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +24,13 @@ func main() {
 }
 
 func getEvents(context *gin.Context) {
-	events := models.GetAllEvents()
+	events, err := models.GetAllEvents()
+
+	if err != nil {
+		utils.HandleHttpError(err, "Could not fetch events", http.StatusInternalServerError, context)
+		return
+	}
+
 	context.JSON(http.StatusOK, events)
 }
 
@@ -32,13 +39,19 @@ func createEvent(context *gin.Context) {
 	err := context.ShouldBindJSON(&event)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request data"})
+		utils.HandleHttpError(err, "Could not parse request data", http.StatusBadRequest, context)
 		return
 	}
 
 	event.ID = 1     // TODO remove dummy
 	event.UserID = 1 // TODO remove dummy
 
-	event.Save()
+	err = event.Save()
+
+	if err != nil {
+		utils.HandleHttpError(err, "Could not save event", http.StatusInternalServerError, context)
+		return
+	}
+
 	context.JSON(http.StatusCreated, event)
 }

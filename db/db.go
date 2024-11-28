@@ -21,6 +21,8 @@ func InitDB() {
 
 	err = DB.Ping()
 	utils.PanicOnError(err, "Error pinging the database")
+
+	createTables()
 }
 
 func makeConnectionString() string {
@@ -33,4 +35,19 @@ func makeConnectionString() string {
 	connectionString = strings.ReplaceAll(connectionString, "{sslMode}", configuration.Config.Database.SslMode)
 
 	return connectionString
+}
+
+func createTables() {
+	createEventsTable := `
+	CREATE TABLE IF NOT EXISTS events (
+		id SERIAL primary key,
+		"name" varchar NOT NULL,
+		description varchar NOT NULL,
+		"location" varchar NOT NULL,
+		date_time timestamptz NOT NULL,
+		user_id int NULL
+	);
+	`
+	_, err := DB.Exec(createEventsTable)
+	utils.PanicOnError(err, "Could not create events table")
 }

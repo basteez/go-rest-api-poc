@@ -1,6 +1,8 @@
 package models
 
 import (
+	"database/sql"
+	"fmt"
 	"time"
 
 	"bstz.it/rest-api/db"
@@ -54,4 +56,21 @@ func GetAllEvents() ([]Event, error) {
 		events = append(events, event)
 	}
 	return events, nil
+}
+
+func GetEventById(id int64) (*Event, error) {
+	query := `SELECT * FROM events WHERE id = $1`
+	row := db.DB.QueryRow(query, id)
+
+	var event Event
+	err := row.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime, &event.UserID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("event with id %d not found: %w", id, sql.ErrNoRows)
+		}
+		return nil, err
+	}
+
+	return &event, nil
+
 }

@@ -5,13 +5,12 @@ import (
 )
 
 type ErrorDto struct {
-	message string
+	Message string `json:"message"`
 }
 
 func HandleHttpError(err error, message string, status int, context *gin.Context) {
 	if err != nil {
 		LogOnError(err, message)
-		context.JSON(status, ErrorDto{message: message})
-		context.Abort()
+		context.JSON(status, ErrorDto{Message: message})
 	}
 }

@@ -60,3 +60,38 @@ func createEvent(context *gin.Context) {
 
 	context.JSON(http.StatusCreated, event)
 }
+
+func updateEvent(context *gin.Context) {
+	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		utils.HandleHttpError(err, "Could not extract id from path", http.StatusBadRequest, context)
+		return
+	}
+
+	_, err = models.GetEventById(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			utils.HandleHttpError(err, "Event not found", http.StatusNotFound, context)
+			return
+		}
+		utils.HandleHttpError(err, "Could not fetch event", http.StatusInternalServerError, context)
+		return
+	}
+
+	var updatedEvent models.Event
+	err = context.ShouldBindJSON(&updatedEvent)
+	if err != nil {
+		utils.HandleHttpError(err, "Could not parse request data", http.StatusBadRequest, context)
+		return
+	}
+
+	updatedEvent.ID = id
+	err = updatedEvent.Update()
+	if err != nil {
+		utils.HandleHttpError(err, "Error updating event", http.StatusInternalServerError, context)
+		return
+	}
+
+	context.JSON(http.StatusNoContent, nil)
+
+}

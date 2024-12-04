@@ -38,16 +38,27 @@ func makeConnectionString() string {
 }
 
 func createTables() {
+	createUserTable := `
+	CREATE TABLE IF NOT EXISTS users (
+		id SERIAL primary key,
+		email varchar NOT NULL UNIQUE,
+		password TEXT NOT NULL)
+	`
+
+	_, err := DB.Exec(createUserTable)
+	utils.PanicOnError(err, "Could not create users table")
+
 	createEventsTable := `
 	CREATE TABLE IF NOT EXISTS events (
-		id SERIAL primary key,
-		"name" varchar NOT NULL,
-		description varchar NOT NULL,
-		"location" varchar NOT NULL,
-		date_time timestamptz NOT NULL,
-		user_id int NULL
+		id SERIAL PRIMARY KEY,
+		"name" VARCHAR NOT NULL,
+		description VARCHAR NOT NULL,
+		"location" VARCHAR NOT NULL,
+		date_time TIMESTAMPTZ NOT NULL,
+		user_id INT NULL,
+		FOREIGN KEY (user_id) REFERENCES users (id)
 	);
 	`
-	_, err := DB.Exec(createEventsTable)
+	_, err = DB.Exec(createEventsTable)
 	utils.PanicOnError(err, "Could not create events table")
 }

@@ -14,7 +14,7 @@ type Event struct {
 	Description string    `binding:"required" json:"description"`
 	Location    string    `binding:"required" json:"location"`
 	DateTime    time.Time `binding:"required" json:"date_time"`
-	UserID      int       `json:"user_id`
+	UserID      int       `json:"user_id"`
 }
 
 func (event *Event) Save() error {

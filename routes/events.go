@@ -95,3 +95,29 @@ func updateEvent(context *gin.Context) {
 	context.JSON(http.StatusNoContent, nil)
 
 }
+
+func deleteEvent(context *gin.Context) {
+	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		utils.HandleHttpError(err, "Could not extract id from path", http.StatusBadRequest, context)
+		return
+	}
+
+	event, err := models.GetEventById(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			utils.HandleHttpError(err, "Event not found", http.StatusNotFound, context)
+			return
+		}
+		utils.HandleHttpError(err, "Could not fetch event", http.StatusInternalServerError, context)
+		return
+	}
+
+	err = event.Delete()
+	if err != nil {
+		utils.HandleHttpError(err, "Could not delete event", http.StatusInternalServerError, context)
+		return
+	}
+
+	context.JSON(http.StatusNoContent, nil)
+}
